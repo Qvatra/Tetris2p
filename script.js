@@ -5,7 +5,7 @@ var playerId;            // TODO: make it specific to device or ip (or guid?)
 $(document).ready(function() {
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
 
-    $('#start').on('click', function() {
+    $('#join').on('click', function() {
         playerId = $('#idInput').val();
         localStorage.setItem('playerId', playerId); // save playerId to localStorage
 
@@ -29,5 +29,11 @@ $(document).ready(function() {
     $('#clear').on('click', function() {
         db.remove();
     });
+
+    $('#start').on('click', function() {
+        setInterval(function() {
+            console.log('tick');
+        }, 1000);
+    });   
 
 });
