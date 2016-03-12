@@ -1,30 +1,33 @@
 var db = new Firebase('https://blinding-inferno-4181.firebaseio.com/');
-var root = this;
-var p1, p2;
+var room = {};           // local object (not db reference) that contains room info
+var playerId;            // TODO: make it specific to device or ip (or guid?)
 
 $(document).ready(function() {
-    $('#nameInput').val('Player1');
+    $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
 
-    $('#start').on('click', function(e) {
-        var name = $('#nameInput').val();
-        var room = db.child("room");
-        if (room && !room.p1) { //we are 1st
-            room.set({ p1: name });
-            root.p1 = name;
-            room.once('child_added', function() {
-                root.p2 = room.child("p2");
-            })
-        } else { // we are 2nd
-            room.set({ p2: name }); // add but replace room.child('p2').set(name)
-            root.p1 = room.p1;
-            root.p2 = name;
+    $('#start').on('click', function() {
+        playerId = $('#idInput').val();
+        localStorage.setItem('playerId', playerId); // save playerId to localStorage
+
+        if (!room.p1 && !room.p2) {
+            db.child("room/p1").set(playerId);      // set 1st
+        } else if (room.p1 && !room.p2 && room.p1 !== playerId) {
+            db.child("room/p2").set(playerId);      // set 2nd
+        } else {
+            console.info('already joined..');
         }
     });
 
     db.on("value", function(snapshot) {
-        $('#dbcontent').html(JSON.stringify(snapshot.val(), null, 2));
+        room = snapshot.val() ? snapshot.val().room : {};
+        $('#dbcontent').html(JSON.stringify(room, null, 2));
     }, function(errorObject) {
         $('#dbcontent').html("The read failed: " + errorObject.code);
+        room = {};
+    });
+
+    $('#clear').on('click', function() {
+        db.remove();
     });
 
 });
