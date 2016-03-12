@@ -179,6 +179,7 @@ $(document).ready(function() {
 
     db.on("value", function(snapshot) {
         room = snapshot.val() ? snapshot.val().room : {};
+        if (room.field) drawState(room.field);
         // $('#dbcontent').html(JSON.stringify(room, null, 2));
         // console.info(JSON.stringify(room, null, 2));
 
@@ -194,6 +195,7 @@ $(document).ready(function() {
     });
 
     $('#clear').on('click', function() {
+        clearInterval(isStarted);
         db.remove();
     });
 
@@ -207,5 +209,5 @@ $(document).ready(function() {
         db.child("room/field").set(fieldArr);
     }
 
-    drawState(fieldArr);
+    
 });
