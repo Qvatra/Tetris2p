@@ -1,50 +1,18 @@
 <html>
-  <head>
-    <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
-  </head>
-  <body>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
     <div id='messagesDiv'></div>
     <input type='text' id='nameInput' placeholder='Name'>
-    <input type='text' id='messageInput' placeholder='Message'>
-    <script>
-      var myDataRef = new Firebase('https://blinding-inferno-4181.firebaseio.com/');
-      $('#messageInput').keypress(function (e) {
-        if (e.keyCode == 13) {
-          var name = $('#nameInput').val();
-          var text = $('#messageInput').val();
-          myDataRef.push({name: name, text: text});
-          $('#messageInput').val('');
-        }
-      });
-      $('#nameInput').keypress(function (e) {
-      var firstName;
-      var secondName;
-        if (e.keyCode == 13) {
-          var name = $('#nameInput').val();
-          var room = myDataRef.child("room");
-          if (room && !room.first) { //we are 1st
-            room.set({ first: name});
-            firstName = name;
-            room.once('child_added', function() {
-              secondName = room.child("second");
-            })
-          } else { // we are 2nd
-            room.set({ second: name}); // add but replace room.child('second').set(name)
-            firstName = room.first;
-            secondName = name;
-          }
-        }
-      });
-      myDataRef.on('child_added', function(snapshot) {
-        var message = snapshot.val();
-        displayChatMessage(message.name, message.text);
-		console.log(message.name, message.text);
-      });
-      function displayChatMessage(name, text) {
-        $('<div/>').text(text).prepend($('<em/>').text(name+': ')).appendTo($('#messagesDiv'));
-        $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
-      };
-    </script>
-  </body>
+    <button onclick='onstart()'>Start</button>
+    <pre id="dbcontent" class="panel"></pre>
+    
+    <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src="script.js"></script>
+</body>
+
 </html>
