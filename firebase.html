@@ -23,14 +23,14 @@
         if (e.keyCode == 13) {
           var name = $('#nameInput').val();
           var room = myDataRef.child("room");
-          if (!room.first) {
-            room.set({ first:name});
+          if (room && !room.first) { //we are 1st
+            room.set({ first: name});
             firstName = name;
-            room.on('child_added', function() {
+            room.once('child_added', function() {
               secondName = room.child("second");
             })
-          } else {
-            room.set({ second: name});
+          } else { // we are 2nd
+            room.set({ second: name}); // add but replace room.child('second').set(name)
             firstName = room.first;
             secondName = name;
           }
