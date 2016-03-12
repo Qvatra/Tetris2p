@@ -13,7 +13,7 @@ var fieldArr = [
     [1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1]];
 
-var block = null;
+var block = [];
 var dir;
 var keyPress = 0;
 var isStarted;
@@ -42,7 +42,8 @@ $(document).ready(function() {
     });
 
     function tick() {
-        if (block === null) {
+        console.log('tick');
+        if (block.length === 0) {
             initBlock();
         } else {
             move(down);
@@ -57,7 +58,7 @@ $(document).ready(function() {
     }
 
     function checkBlock() {
-        if (block === null) {
+        if (block.length === 0) {
             return;
         }
         var blockStopped = false;
@@ -76,7 +77,7 @@ $(document).ready(function() {
                 });
                 return current_value;
             });
-            block = null;
+            block = [];
         }
     }
 
@@ -182,7 +183,7 @@ $(document).ready(function() {
         // console.info(JSON.stringify(room, null, 2));
 
         if (room.field && !isStarted) {
-            if (Object.keys(room).length !== 0 && isStarted) {
+            if (Object.keys(room).length !== 0) {
                 dir = room[room.p1.id === playerId ? 'p1' : 'p2'].dir;
             }
             isStarted = setInterval(tick, 1000);
