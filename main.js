@@ -2,6 +2,7 @@
 var room = {};           // local object (not db reference) that contains room info
 var playerId;            // TODO: make it specific to device or ip (or guid?)
 var isStarted;
+var keypress = 0;
 
 $(document).ready(function() {
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
@@ -24,7 +25,7 @@ $(document).ready(function() {
 
     Api.db.on("value", function(snapshot) {
         room = snapshot.val() ? snapshot.val().room : {};
-        
+
         if (room.field) {
             Render.drawState(room.field);
         }
@@ -35,7 +36,7 @@ $(document).ready(function() {
             if (Object.keys(room).length !== 0) {
                 Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
             }
-            isStarted = setInterval(Engine.tick, 1000);
+            isStarted = setInterval(tick, 1000);
         }
     }, function(errorObject) {
         $('#dbcontent').html("The read failed: " + errorObject.code);
@@ -55,5 +56,21 @@ $(document).ready(function() {
         clearInterval(isStarted);
         Api.remove('room/field');
     });
+
+    $(document).ready(function() {
+        $(document).keypress(function(e) {
+            console.log('pressed: ', e.keyCode);
+            keypress = e;
+        });
+    });
+
+    function tick() {
+      Api.change("room/field", function(current_value) {
+          if (current_value === null)
+          return;
+          return Engine.tick(current_value, keypress);
+      });
+      keypress=0;
+    }
 
 });

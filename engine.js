@@ -1,112 +1,100 @@
 var Engine = (function(dimention) {
-    "use strict";
     var module = {};
 
     // private variables
-    var keyPress = 0;
     var block = [];
     var dir;
 
-    // private methods   
-    function checkState() {
-        checkBlock();
-        checkLines();
+    // private methods
+    function checkState(field) {
+        checkBlock(field);
+        checkLines(field);
     }
 
-    // what is does??     
-    function checkBlock() {
+    // check that block cant move down; if so block converts in field element
+    function checkBlock(fiels) {
         if (block.length === 0) {
             return;
         }
+        //analyze elements under block
         var blockStopped = false;
         block.forEach(function(item, idx) {
-            if (room.field[item.x][item.y + dir] === dir) {
-                blockStopped = true;
+            var p = direction(item); //point under block point
+            if (field[p.y][p.x] === dir) {
+              blockStopped = true;
             }
         });
+        //field points, marked as "block", is setting as plain field elements
         if (blockStopped) {
-            Api.change("room/field", function(current_value) {
-                if (current_value === null) {
-                    return;
-                }
-                block.forEach(function(item, idx) {
-                    current_value[item.x][item.y] = dir;
-                });
-                return current_value;
+            block.forEach(function(item, idx) {
+                field[item.x][item.y] = dir;
             });
             block = [];
         }
     }
 
-    // what is does??    
-    function checkLines() {
-        Api.change("room/field", function(current_value) {
-            if (current_value === null) {
-                return;
-            }
-            current_value.forEach(function(item, idx) {
-                var sign = item[0];
-                var lineComplete = true;
-                item.forEach(function(item2, idx2) {
-                    if (item2 * sign < 0) {
-                        lineComplete = false;
-                    }
-                });
-                if (lineComplete) {
-                    item.forEach(function(item2, idx2) {
-                        item2 = -item2;
-                    });
+    // checking that all elements of each line marked in positive or negative numbers
+    function checkLines(field) {
+        field.forEach(function(item, idx) {
+            var sign = item[0];
+            var lineComplete = true;
+            item.forEach(function(item2, idx2) {
+                if (item2 * sign <= 0) {
+                    lineComplete = false;
                 }
             });
-            return current_value;
+            // and if so, line swap it color
+            if (lineComplete) {
+                item.forEach(function(item2, idx2) {
+                    item2 = -item2;
+                });
+            }
         });
     }
 
-    // init new falling black    
-    function initBlock() {
+    // init new falling black
+    function initBlock(field) {
         block = [{ x: dimention[0] / 2, y: dimention[1] / 2 * (1 - dir) - 1 }];
-        Api.change("room/field", function(current_value) {
-            if (current_value === null) {
-                return;
-            }
-            block.forEach(function(item) {
-                current_value[item.y][item.x] = dir * 2;
-            });
-            return current_value;
+        block.forEach(function(item) {
+            field[item.y][item.x] = dir * 2;
         });
     };
 
-    function move(direction) {
-        Api.change("room/field", function(current_value) {
-            if (current_value === null) {
-                return;
+    function move(field, direction) {
+        if (field === null) {
+            return;
+        }
+        //check, that we can move in choosen direction
+        block.forEach(function(item, idx) {
+            var p = direction(item);
+            if (field[p.y][p.x] === dir) {
+              return;
             }
-            block.forEach(function(item, idx) {
-                current_value[item.x][item.y] = -dir;
-            });
-            block.forEach(function(item, idx) {
-                item = direction(item);
-            });
-            block.forEach(function(item, idx) {
-                current_value[item.x][item.y] = dir;
-            });
-            return current_value;
+        });
+        //mark all field's points in opposite color
+        block.forEach(function(item, idx) {
+            field[item.y][item.x] = -dir;
+        });
+        // replace block's element, moving them
+        block.forEach(function(item, idx) {
+            item = direction(item);
+        });
+        //mark field's points under block
+        block.forEach(function(item, idx) {
+            field[item.y][item.x] = dir * 2;
         });
     }
 
     function down(item) {
-        item.y = item.y + dir;
-        return item;
+        return {x:item.x, y:item.y + dir};
     }
 
     function left(item) {
-        item.x = item.x - 1;
-        return item;
+        return {x:item.x-1, y:item.y};
     }
 
     function right(item) {
-        item.x = item.x + 1;
-        return item;
+        return {x:item.x+1, y:item.y};
     }
 
     function playerAction() {
@@ -117,26 +105,20 @@ var Engine = (function(dimention) {
         keyPress = 0;
     }
 
-    $(document).ready(function() {
-        $(document).keypress(function(e) {
-            console.log('pressed: ', e.keyCode);
-            keypress = e;
-        });
-    });
-
     // public variables
 
-    // public methods    
-    module.tick = function() {
-        console.info('tick');
-        if (block.length === 0) {
-            initBlock();
-        } else {
-            move(down);
-        }
-        playerAction();
-        checkState();
-    }
+    // public methods
+    module.tick = function(field, keypress) {
+        // console.info('tick');
+        // if (block.length === 0) {
+        //     initBlock(field);
+        // } else {
+        //     move(field, down);
+        // }
+        // playerAction(field, keypress);
+        // checkState(field);
+        return field;
+    },
 
     module.setDir = function(val) {
         dir = val;
