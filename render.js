@@ -70,14 +70,16 @@ var Render = (function(dimention, size, colors) {
     }
 
     //returns formatted field as a string
-    module.jsonField = function() {
-        var result = '';
-        room.field.forEach((row, y) => {
-            result = result + '\n';
-            row.forEach((cell, x) => {
-                result = result + cell + ',';
+    module.jsonField = function(field) {
+        var result = undefined;
+        if (field) {
+            field.forEach((row, y) => {
+                result = result + '\n';
+                row.forEach((cell, x) => {
+                    result = result + cell + ',';
+                })
             })
-        })
+        }
         return result;
     }
 
