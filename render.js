@@ -23,11 +23,8 @@ var Render = (function(dimention, size, colors) {
             case -2:
                 color = colors.block[1];
                 break;
-            case 3:
-                color = colors.holes[0];
-                break;
-            case -3:
-                color = colors.holes[1];
+            case 0:
+                color = colors.holes;
                 break;
             default:
                 color = 'red';
@@ -59,9 +56,9 @@ var Render = (function(dimention, size, colors) {
             field.push([]);
             for (var x = 0; x < dimention[0]; x++) {
                 if (y >= dimention[1] / 2) {
-                    val = (dimention[0] - x - 1 === (dimention[1] - y - 1) % dimention[0]) ? 3 : 1;
+                    val = (dimention[0] - x - 1 === (dimention[1] - y - 1) % dimention[0]) ? 0 : 1;
                 } else {
-                    val = (x === y % dimention[0]) ? -3 : -1;
+                    val = (x === y % dimention[0]) ? 0 : -1;
                 }
                 field[y].push(val);
             }
