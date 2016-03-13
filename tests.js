@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    Engine.setDir(-1);
+    Engine.setDir(1);
     var field = Render.generateField();
     $('#testResults').html(Render.jsonField(field));
 

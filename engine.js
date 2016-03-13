@@ -44,7 +44,7 @@ var Engine = (function(dimention) {
 
     // init new falling black
     function initBlock(field) {
-        block = [{ x: dimention[0] / 2, y: dimention[1] / 2 * (1 - dir) - 1 }];
+        block = [{ x: dimention[0] / 2, y: dir > 0 ? 0 : dimention[1] - 1 }];
         block.forEach(function(item) {
             field[item.y][item.x] = dir * 2;
         });
