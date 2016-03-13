@@ -55,16 +55,17 @@ var Render = (function(dimention, size, colors) {
         for (var y = 0; y < dimention[1]; y++) {
             field.push([]);
             for (var x = 0; x < dimention[0]; x++) {
-                if (y >= dimention[1] / 2) {
-                    val = (dimention[0] - x - 1 === (dimention[1] - y - 1) % dimention[0]) ? 0 : 1;
-                } else {
-                    val = (x === y % dimention[0]) ? 0 : -1;
-                }
+                val = module.isNeutral(x, y) ? 0 : y >= dimention[1] / 2 ? 1 : -1;
                 field[y].push(val);
             }
         }
         return field;
     }
+
+    // returns true if given x, y reserved as neutral field cell    
+    module.isNeutral = function(x, y) {
+        return dimention[0] - x - 1 === (dimention[1] - y - 1) % dimention[0];
+    }    
 
     // returns field as a formatted string
     module.jsonField = function(field) {
