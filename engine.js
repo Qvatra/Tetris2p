@@ -24,22 +24,24 @@ var Engine = (function(dimention) {
 
     // checking that all elements of each line marked in positive or negative numbers
     function checkLines(field) {
-        field = field.map(function(item, idx) {
+        var newField = field.map(function(item, idx) {
             if (item[0] === 0)
-                return;
+                return item;
             var sign = item[0] > 0 ? 1 : -1;
             var lineComplete = item.every(function(item2, idx2) {
                 return item2 * sign === 1;
             });
             // and if so, line swap it color
             if (lineComplete) {
-                return item.map(function(item2) {
-                    return -sign;
+                var res = item.map(function(item2) {
+                    return 5;
                 });
+                return res;
             } else {
-              return item;
+                return item;
             }
         });
+        field = newField;
     }
 
     // init new falling black
@@ -56,7 +58,7 @@ var Engine = (function(dimention) {
             // next position
             var p = direction(item);
             // check for boundaries and elements of the same type
-            return field[p.y][p.x] !== dir && p.y > 0 && p.x > 0 && p.y < dimention[1] - 1 && p.x < dimention[0] - 1;
+            return field[p.y][p.x] !== dir && field[p.y][p.x] !== -2*dir && p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0];
         });
     }
 
