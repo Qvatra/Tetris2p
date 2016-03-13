@@ -1,8 +1,12 @@
+body{
+    background: cadetblue;
+}
+
 .panel {
     right: 9px;
     position: absolute;
     padding: 5px;
-    background: aliceblue;
+    background: burlywood;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 

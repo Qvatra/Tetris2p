@@ -1,10 +1,9 @@
-
-var room = {};           // local object (not db reference) that contains room info
-var playerId;            // TODO: make it specific to device or ip (or guid?)
-var isStarted;
-var keypress = 0;
-
 $(document).ready(function() {
+    var room = {};           // local object (not db reference) that contains room info
+    var playerId;            // TODO: make it specific to device or ip (or guid?)
+    var isStarted;
+    var keypress = 0;
+
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
 
     $('#join').on('click', function() {
@@ -26,17 +25,18 @@ $(document).ready(function() {
     Api.db.on("value", function(snapshot) {
         room = snapshot.val() ? snapshot.val().room : {};
 
+        $('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
+
         if (room.field) {
             Render.drawState(room.field);
-        }
 
-        $('#dbcontent').html(Render.jsonField(room.field) + '\n' +  JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
-
-        if (room.field && !isStarted) {
-            if (Object.keys(room).length !== 0) {
-                Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
+            if (!isStarted) {
+                console.info('Field was found. Started..');
+                if (Object.keys(room).length !== 0) {
+                    Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
+                }
+                isStarted = setInterval(tick, 1000);
             }
-            isStarted = setInterval(tick, 1000);
         }
     }, function(errorObject) {
         $('#dbcontent').html("The read failed: " + errorObject.code);
@@ -65,12 +65,12 @@ $(document).ready(function() {
     });
 
     function tick() {
-      Api.change("room/field", function(current_value) {
-          if (current_value === null)
-          return;
-          return Engine.tick(current_value, keypress);
-      });
-      keypress=0;
+        Api.change("room/field", function(current_value) {
+            if (current_value === null)
+                return;
+            return Engine.tick(current_value, keypress);
+        });
+        keypress = 0;
     }
 
 });

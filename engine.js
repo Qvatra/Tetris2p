@@ -1,4 +1,5 @@
 var Engine = (function(dimention) {
+    "use strict";
     var module = {};
 
     // private variables
@@ -6,28 +7,16 @@ var Engine = (function(dimention) {
     var dir;
 
     // private methods
-    function checkState(field) {
-        checkBlock(field);
+    function checkState(field, direction) {
+        applyBlock(field, direction);
         checkLines(field);
     }
 
-    // check that block cant move down; if so block converts in field element
-    function checkBlock(fiels) {
-        if (block.length === 0) {
-            return;
-        }
-        //analyze elements under block
-        var blockStopped = false;
-        block.forEach(function(item, idx) {
-            var p = direction(item); //point under block point
-            if (field[p.y][p.x] === dir) {
-              blockStopped = true;
-            }
-        });
-        //field points, marked as "block", is setting as plain field elements
-        if (blockStopped) {
-            block.forEach(function(item, idx) {
-                field[item.x][item.y] = dir;
+    // merges an active block with the field
+    function applyBlock(field, direction) {
+        if (block.length !== 0 && !canBeMoved(field, direction)) {
+            block.forEach(function(item) {
+                field[item.y][item.x] = dir;
             });
             block = [];
         }
@@ -60,65 +49,69 @@ var Engine = (function(dimention) {
         });
     };
 
-    function move(field, direction) {
-        if (field === null) {
-            return;
-        }
-        //check, that we can move in choosen direction
-        block.forEach(function(item, idx) {
+    // returns true if 'block' could be moved in 'direction' direction and false otherwise  
+    function canBeMoved(field, direction) {
+        return block.every(function(item) {
+            // next position
             var p = direction(item);
-            if (field[p.y][p.x] === dir) {
-              return;
-            }
+            // check for boundaries and elements of the same type
+            return field[p.y][p.x] !== dir && p.y > 0 && p.x > 0 && p.y < dimention[1] - 1 && p.x < dimention[0] - 1;
         });
-        //mark all field's points in opposite color
-        block.forEach(function(item, idx) {
+    }
+
+    function move(field, direction) {
+        if (!field || !canBeMoved(field, direction)) return;
+        
+        console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
+
+        // mark all field's points in opposite color
+        block.forEach(function(item) {
             field[item.y][item.x] = -dir;
         });
+
         // replace block's element, moving them
-        block.forEach(function(item, idx) {
-            item = direction(item);
+        block = block.map(function(item) {
+            return direction(item);
         });
-        //mark field's points under block
-        block.forEach(function(item, idx) {
+
+        // mark field's points under block
+        block.forEach(function(item) {
             field[item.y][item.x] = dir * 2;
         });
     }
 
     function down(item) {
-        return {x:item.x, y:item.y + dir};
+        return { x: item.x, y: item.y + dir };
     }
 
     function left(item) {
-        return {x:item.x-1, y:item.y};
+        return { x: item.x - 1, y: item.y };
     }
 
     function right(item) {
-        return {x:item.x+1, y:item.y};
+        return { x: item.x + 1, y: item.y };
     }
 
-    function playerAction() {
-        if (keyPress === 0) {
+    function playerAction(keypress) {
+        if (keypress === 0) {
             return;
         }
-        console.log(keyPress);
-        keyPress = 0;
+        console.log(keypress);
+        keypress = 0;
     }
-
-    // public variables
 
     // public methods
     module.tick = function(field, keypress) {
-        // console.info('tick');
-        // if (block.length === 0) {
-        //     initBlock(field);
-        // } else {
-        //     move(field, down);
-        // }
-        // playerAction(field, keypress);
-        // checkState(field);
+        if (block.length === 0) {
+            initBlock(field);
+            console.info('init..');
+        } else {
+            move(field, down);
+        }
+        playerAction(keypress);
+        checkState(field, down);
         return field;
-    },
+    }
 
     module.setDir = function(val) {
         dir = val;
