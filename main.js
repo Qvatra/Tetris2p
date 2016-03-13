@@ -27,13 +27,9 @@ $(document).ready(function() {
         
         if (room.field) {
             Render.drawState(room.field);
-
-
         }
 
-
-
-        $('#dbcontent').html(jsonField + JSON.stringify(Object.assign({}, room, { field: 'null' }), null, 2));
+        $('#dbcontent').html(Render.jsonField(room.field) + '\n' +  JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
 
         if (room.field && !isStarted) {
             if (Object.keys(room).length !== 0) {

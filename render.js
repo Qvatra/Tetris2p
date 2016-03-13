@@ -69,17 +69,20 @@ var Render = (function(dimention, size, colors) {
         return field;
     }
 
-    //returns formatted field as a string
+    // returns field as a formatted string
     module.jsonField = function(field) {
-        var result = undefined;
+        var result = '';
         if (field) {
             field.forEach((row, y) => {
-                result = result + '\n';
                 row.forEach((cell, x) => {
-                    result = result + cell + ',';
+                    var val = cell.toString();
+                    var formatted = val.length > 1 ? val : ' ' + val;
+                    result = result + formatted + ' ';
                 })
+                result = result + '\n';
             })
         }
+        console.log(result);
         return result;
     }
 
