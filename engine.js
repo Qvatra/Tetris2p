@@ -65,7 +65,7 @@ var Engine = (function(dimention) {
     function move(field, direction) {
         if (!field || !canBeMoved(field, direction)) return;
 
-        console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
+        //console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
 
         // mark all field's points in opposite color
         block.forEach(function(item) {
