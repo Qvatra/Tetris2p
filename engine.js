@@ -56,14 +56,14 @@ var Engine = (function(dimention) {
             // next position
             var p = direction(item);
             // check for boundaries and elements of the same type
-            return field[p.y][p.x] !== dir && p.y > 0 && p.x > 0 && p.y < dimention[1] - 1 && p.x < dimention[0] - 1;
+            return field[p.y][p.x] !== dir && p.y > -1 && p.x > -1 && p.y < dimention[1] && p.x < dimention[0];
         });
     }
 
     function move(field, direction) {
         if (!field || !canBeMoved(field, direction)) return;
 
-        console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
+        //console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
 
         // mark all field's points in opposite color
         block.forEach(function(item) {
