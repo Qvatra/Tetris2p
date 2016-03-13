@@ -7,18 +7,15 @@ var Engine = (function(dimention) {
     var dir;
 
     // private methods
+    // merges an active block with the field    
     function checkState(field, direction) {
-        applyBlock(field, direction);
-        checkLines(field);
-    }
-
-    // merges an active block with the field
-    function applyBlock(field, direction) {
         if (block.length !== 0 && !canBeMoved(field, direction)) {
             block.forEach(function(item) {
                 field[item.y][item.x] = dir;
             });
             block = [];
+            // check if line should be blowed up
+            checkLines(field);            
         }
     }
 
@@ -32,12 +29,8 @@ var Engine = (function(dimention) {
                 });
                 // and if so, line swap it color
                 if (lineComplete) {
-                    for (var j=0; j<field[i].length; j++) {
-                      if (Render.isNeutral(j, i)) {
-                        field[i][j]=0;
-                      } else {
-                        field[i][j]=-sign;
-                      }
+                    for (var j = 0; j < field[i].length; j++) {
+                        field[i][j] = Render.isNeutral(j, i) ? 0 : -sign;
                     }
                 }
             }
@@ -58,22 +51,17 @@ var Engine = (function(dimention) {
             // next position
             var p = direction(item);
             // check for boundaries and elements of the same type
-            return field[p.y][p.x] !== dir && field[p.y][p.x] !== -2*dir && p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0];
+            return field[p.y][p.x] !== dir && field[p.y][p.x] !== -2 * dir && p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0];
         });
     }
 
     function move(field, direction) {
         if (!field || !canBeMoved(field, direction)) return;
-
         //console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
 
         // mark all field's points in opposite color
         block.forEach(function(item) {
-            if (Render.isNeutral(item.x, item.y)) {
-                field[item.y][item.x] = 0;
-            } else {
-                field[item.y][item.x] = -dir;
-            }
+            field[item.y][item.x] = Render.isNeutral(item.x, item.y) ? 0 : -dir;
         });
 
         // replace block's element, moving them
@@ -100,7 +88,7 @@ var Engine = (function(dimention) {
     }
 
     function playerAction(field, keypress) {
-        console.log("in pa");
+        //console.log("in pa");
         if (keypress === 0) {
             return;
         }
@@ -120,11 +108,11 @@ var Engine = (function(dimention) {
     module.tick = function(field, keypress) {
         if (block.length === 0) {
             initBlock(field);
-            console.info('init..');
+            //console.info('init..');
         } else {
             move(field, down);
         }
-        console.log("before pa");
+        //console.log("before pa");
         playerAction(field, keypress);
         checkState(field, down);
         return field;
