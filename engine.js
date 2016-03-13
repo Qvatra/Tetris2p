@@ -24,19 +24,20 @@ var Engine = (function(dimention) {
 
     // checking that all elements of each line marked in positive or negative numbers
     function checkLines(field) {
-        field.forEach(function(item, idx) {
-            var sign = item[0];
-            var lineComplete = true;
-            item.forEach(function(item2, idx2) {
-                if (item2 * sign <= 0) {
-                    lineComplete = false;
-                }
+        field = field.map(function(item, idx) {
+            if (item[0] === 0)
+                return;
+            var sign = item[0] > 0 ? 1 : -1;
+            var lineComplete = item.every(function(item2, idx2) {
+                return item2 * sign === 1;
             });
             // and if so, line swap it color
             if (lineComplete) {
-                item.forEach(function(item2, idx2) {
-                    item2 = -item2;
+                return item.map(function(item2) {
+                    return -sign;
                 });
+            } else {
+              return item;
             }
         });
     }
@@ -49,7 +50,7 @@ var Engine = (function(dimention) {
         });
     };
 
-    // returns true if 'block' could be moved in 'direction' direction and false otherwise  
+    // returns true if 'block' could be moved in 'direction' direction and false otherwise
     function canBeMoved(field, direction) {
         return block.every(function(item) {
             // next position
@@ -61,7 +62,7 @@ var Engine = (function(dimention) {
 
     function move(field, direction) {
         if (!field || !canBeMoved(field, direction)) return;
-        
+
         console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
 
         // mark all field's points in opposite color
@@ -92,11 +93,20 @@ var Engine = (function(dimention) {
         return { x: item.x + 1, y: item.y };
     }
 
-    function playerAction(keypress) {
+    function playerAction(field, keypress) {
+        console.log("in pa");
         if (keypress === 0) {
             return;
         }
-        console.log(keypress);
+        if (keypress === 97) {//a
+            move(field, left);
+        }
+        if (keypress === 100) {//d
+            move(field, right);
+        }
+        if (keypress === 115) {//s
+            move(field, down);
+        }
         keypress = 0;
     }
 
@@ -108,7 +118,8 @@ var Engine = (function(dimention) {
         } else {
             move(field, down);
         }
-        playerAction(keypress);
+        console.log("before pa");
+        playerAction(field, keypress);
         checkState(field, down);
         return field;
     }

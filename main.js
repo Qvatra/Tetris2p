@@ -59,8 +59,7 @@ $(document).ready(function() {
 
     $(document).ready(function() {
         $(document).keypress(function(e) {
-            console.log('pressed: ', e.keyCode);
-            keypress = e;
+            keypress = e.keyCode;
         });
     });
 
