@@ -82,7 +82,6 @@ var Render = (function(dimention, size, colors) {
                 result = result + '\n';
             })
         }
-        console.log(result);
         return result;
     }
 
