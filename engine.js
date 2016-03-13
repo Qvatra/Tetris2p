@@ -24,24 +24,20 @@ var Engine = (function(dimention) {
 
     // checking that all elements of each line marked in positive or negative numbers
     function checkLines(field) {
-        var newField = field.map(function(item, idx) {
-            if (item[0] === 0)
-                return item;
-            var sign = item[0] > 0 ? 1 : -1;
-            var lineComplete = item.every(function(item2, idx2) {
-                return item2 * sign === 1;
-            });
-            // and if so, line swap it color
-            if (lineComplete) {
-                var res = item.map(function(item2) {
-                    return 5;
+        for (var i=0; i<field.length; i++) {
+            if (field[i][0] !== 0) {
+                var sign = field[i][0] > 0 ? 1 : -1;
+                var lineComplete = field[i].every(function(item2, idx2) {
+                    return item2 * sign === 1;
                 });
-                return res;
-            } else {
-                return item;
-            }
-        });
-        field = newField;
+                // and if so, line swap it color
+                if (lineComplete) {
+                    for (var j=0; j<field[i].length; j++) {
+                        field[i][j]=-sign;
+                    }
+                }
+          }
+        };
     }
 
     // init new falling black
