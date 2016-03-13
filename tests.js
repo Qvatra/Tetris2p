@@ -1,10 +1,42 @@
 $(document).ready(function() {
-    Engine.setDir(-1);
-    var field = Render.generateField();
-    $('#testResults').html(Render.jsonField(field));
+    var dir = 1;
+    var ctrl = 0;
 
-    $('#start').on('click', function() {
-        field = Engine.tick(field, 0); //97, 100, 115
-        $('#testResults').html(Render.jsonField(field));
+    Engine.setDir(dir);
+    var field = Render.generateField();
+    refresh();
+
+    $('#tick').on('click', function() {
+        field = Engine.tick(field, ctrl);
+        refresh();
     });
+
+    $('#flip').on('click', function() {
+        dir = -dir;
+        Engine.setDir(dir);
+        refresh();
+    });
+
+    $('#left').on('click', function() {
+        ctrl = 97;
+        refresh();
+    });
+    $('#down').on('click', function() {
+        ctrl = 115;
+        refresh();
+    });
+    $('#right').on('click', function() {
+        ctrl = 100;
+        refresh();
+    });
+    $('#noctrl').on('click', function() {
+        ctrl = 0;
+        refresh();
+    }); 
+
+    function refresh() {
+        $('#testResults').html(Render.jsonField(field) + '\n dir = ' + dir + '\n ctrl = ' + ctrl);
+        Render.drawState(field);
+    }
+
 });

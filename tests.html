@@ -1,9 +1,22 @@
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <button id="start">Test</button>
-    <pre id="testResults"></pre>
+    <div class="right">
+        <div style="margin: 33px 19px;">
+            <button id="left"><--</button>
+            <button id="down" style="width: 30px;">V</button>
+            <button id="right" class="right">--></button>
+            <br /><br />
+            <button id="noctrl">noCtrl</button>
+            <button id="flip" class="right">Flip</button>
+            <br /><br />
+            <button id="tick" style="width: 100%;">Tick</button>
+        <div />
+        <pre id="testResults" class="panel"></pre>
+    </div>
+    
     <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
     <script src="raphael-min.js"></script>
