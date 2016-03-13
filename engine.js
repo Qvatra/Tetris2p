@@ -24,7 +24,7 @@ var Engine = (function(dimention) {
 
     // checking that all elements of each line marked in positive or negative numbers
     function checkLines(field) {
-        for (var i=0; i<field.length; i++) {
+        for (var i = 0; i < field.length; i++) {
             if (field[i][0] !== 0) {
                 var sign = field[i][0] > 0 ? 1 : -1;
                 var lineComplete = field[i].every(function(item2, idx2) {
@@ -32,12 +32,12 @@ var Engine = (function(dimention) {
                 });
                 // and if so, line swap it color
                 if (lineComplete) {
-                    for (var j=0; j<field[i].length; j++) {
-                        field[i][j]=-sign;
+                    for (var j = 0; j < field[i].length; j++) {
+                        field[i][j] = -sign;
                     }
                 }
-          }
-        };
+            }
+        }
     }
 
     // init new falling black
