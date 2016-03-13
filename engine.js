@@ -33,7 +33,11 @@ var Engine = (function(dimention) {
                 // and if so, line swap it color
                 if (lineComplete) {
                     for (var j=0; j<field[i].length; j++) {
+                      if (Render.isNeutral(j, i)) {
+                        field[i][j]=0;
+                      } else {
                         field[i][j]=-sign;
+                      }
                     }
                 }
           }
@@ -65,7 +69,11 @@ var Engine = (function(dimention) {
 
         // mark all field's points in opposite color
         block.forEach(function(item) {
-            field[item.y][item.x] = -dir;
+            if (Render.isNeutral(item.x, item.y)) {
+                field[item.y][item.x] = 0;
+            } else {
+                field[item.y][item.x] = -dir;
+            }
         });
 
         // replace block's element, moving them
