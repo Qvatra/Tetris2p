@@ -70,8 +70,8 @@ var Render = (function(dimention, size, colors) {
     module.jsonField = function(field) {
         var result = '';
         if (field) {
-            field.forEach((row, y) => {
-                row.forEach((cell, x) => {
+            field.forEach(function(row, y) {
+                row.forEach(function(cell, x) {
                     var val = cell.toString();
                     var formatted = val.length > 1 ? val : ' ' + val;
                     result = result + formatted + ' ';
