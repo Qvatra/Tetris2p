@@ -1,8 +1,6 @@
 
 var room = {};           // local object (not db reference) that contains room info
 var playerId;            // TODO: make it specific to device or ip (or guid?)
-
-
 var isStarted;
 
 $(document).ready(function() {
@@ -26,9 +24,16 @@ $(document).ready(function() {
 
     Api.db.on("value", function(snapshot) {
         room = snapshot.val() ? snapshot.val().room : {};
-        if (room.field) Render.drawState(room.field);
-        // $('#dbcontent').html(JSON.stringify(room, null, 2));
-        // console.info(JSON.stringify(room, null, 2));
+        
+        if (room.field) {
+            Render.drawState(room.field);
+
+
+        }
+
+
+
+        $('#dbcontent').html(jsonField + JSON.stringify(Object.assign({}, room, { field: 'null' }), null, 2));
 
         if (room.field && !isStarted) {
             if (Object.keys(room).length !== 0) {
@@ -41,9 +46,18 @@ $(document).ready(function() {
         room = {};
     });
 
-    $('#clear').on('click', function() {
+    $('#start').on('click', function() {
+        Api.save("room/field", Render.generateField());
+    });
+
+    $('#clearDb').on('click', function() {
         clearInterval(isStarted);
-        Api.db.remove();
+        Api.remove('room');
+    });
+
+    $('#clearField').on('click', function() {
+        clearInterval(isStarted);
+        Api.remove('room/field');
     });
 
 });

@@ -1,4 +1,5 @@
 var Render = (function(dimention, size, colors) {
+    "use strict";
     var module = {};
 
     // private variables
@@ -60,12 +61,24 @@ var Render = (function(dimention, size, colors) {
                 if (y >= dimention[1] / 2) {
                     val = (dimention[0] - x - 1 === (dimention[1] - y - 1) % dimention[0]) ? 3 : 1;
                 } else {
-                    val = (x === y%dimention[0]) ? -3 : -1;
+                    val = (x === y % dimention[0]) ? -3 : -1;
                 }
                 field[y].push(val);
             }
         }
         return field;
+    }
+
+    //returns formatted field as a string
+    module.jsonField = function() {
+        var result = '';
+        room.field.forEach((row, y) => {
+            result = result + '\n';
+            row.forEach((cell, x) => {
+                result = result + cell + ',';
+            })
+        })
+        return result;
     }
 
     return module;

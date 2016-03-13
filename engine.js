@@ -1,4 +1,5 @@
 var Engine = (function(dimention) {
+    "use strict";
     var module = {};
 
     // private variables
@@ -135,11 +136,11 @@ var Engine = (function(dimention) {
         }
         playerAction();
         checkState();
-    },
+    }
 
-        module.setDir = function(val) {
-            dir = val;
-        }
+    module.setDir = function(val) {
+        dir = val;
+    }
 
     return module;
 } (field_dimention));
