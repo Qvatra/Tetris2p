@@ -32,14 +32,14 @@ var Engine = (function(dimention) {
                 return field[y][x] === field[y][(x + 1) % dimention[0]];
             });
 
-            // ..and if so, line swaps its color
+            // ..and if so, blow the line up
             if (lineComplete) {
                 for (var x = 0; x < dimention[0]; x++) {
                     field[y][x] = Render.isNeutral(x, y) ? 0 : -field[y][x];
                 }
 
-                // ..and all top blocks fall
-                if (dir === 1) { // fall down
+                // ..and make all top blocks fall
+                if (dir === 1) { // ..down
                     for (var row = y - 1; row >= 0; row--) {
                         for (var col = 0; col < dimention[0]; col++) {
                             if (field[row][col] === dir / Math.abs(dir)) {
@@ -47,7 +47,7 @@ var Engine = (function(dimention) {
                             }
                         }
                     }
-                } else { // fall up
+                } else { // ..up
                     for (var row = y + 1; row < dimention[1]; row++) {
                         for (var col = 0; col < dimention[0]; col++) {
                             if (field[row][col] === dir / Math.abs(dir)) {
@@ -74,7 +74,7 @@ var Engine = (function(dimention) {
             // next position
             var p = direction(item);
             // check for boundaries and elements of the same type
-            return field[p.y][p.x] !== dir && field[p.y][p.x] !== -2 * dir && p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0];
+            return p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0] && field[p.y][p.x] !== dir && field[p.y][p.x] !== -2 * dir;
         });
     }
 
