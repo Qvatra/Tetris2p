@@ -7,30 +7,53 @@ var Engine = (function(dimention) {
     var dir;
 
     // private methods
-    // merges an active block with the field    
-    function checkState(field, direction) {
-        if (block.length !== 0 && !canBeMoved(field, direction)) {
-            block.forEach(function(item) {
-                field[item.y][item.x] = dir;
-            });
-            block = [];
-            // check if line should be blowed up
-            checkLines(field);            
+
+    function checkState(field) {
+        if (block.length !== 0 && !canBeMoved(field, down)) {
+            mergeBlock(field);
         }
+    }
+
+    // merges an active block with the field if block can't move down anymre    
+    function mergeBlock(field) {
+        block.forEach(function(item) {
+            field[item.y][item.x] = dir;
+        });
+        block = [];
+        // check if line should be blowed up
+        checkLines(field);
     }
 
     // checking that all elements of each line marked in positive or negative numbers
     function checkLines(field) {
-        for (var i = 0; i < field.length; i++) {
-            if (field[i][0] !== 0) {
-                var sign = field[i][0] > 0 ? 1 : -1;
-                var lineComplete = field[i].every(function(item2, idx2) {
-                    return item2 * sign === 1;
-                });
-                // and if so, line swap it color
-                if (lineComplete) {
-                    for (var j = 0; j < field[i].length; j++) {
-                        field[i][j] = Render.isNeutral(j, i) ? 0 : -sign;
+        for (var y = 0; y < dimention[1]; y++) {
+
+            var lineComplete = field[y].every(function(item, x) {
+                return field[y][x] === field[y][(x + 1) % dimention[0]];
+            });
+
+            // ..and if so, line swaps its color
+            if (lineComplete) {
+                for (var x = 0; x < dimention[0]; x++) {
+                    field[y][x] = Render.isNeutral(x, y) ? 0 : -field[y][x];
+                }
+
+                // ..and all top blocks fall
+                if (dir === 1) { // fall down
+                    for (var row = y - 1; row >= 0; row--) {
+                        for (var col = 0; col < dimention[0]; col++) {
+                            if (field[row][col] === dir / Math.abs(dir)) {
+                                moveCell(field, { x: col, y: row }, down);
+                            }
+                        }
+                    }
+                } else { // fall up
+                    for (var row = y + 1; row < dimention[1]; row++) {
+                        for (var col = 0; col < dimention[0]; col++) {
+                            if (field[row][col] === dir / Math.abs(dir)) {
+                                moveCell(field, { x: col, y: row }, down);
+                            }
+                        }
                     }
                 }
             }
@@ -55,23 +78,22 @@ var Engine = (function(dimention) {
         });
     }
 
-    function move(field, direction) {
+    // move given cell and return cells new coordinates    
+    function moveCell(field, cell, direction) {
+        var markup = field[cell.y][cell.x]; // markup is a number on a field
+        field[cell.y][cell.x] = Render.isNeutral(cell.x, cell.y) ? 0 : -markup / Math.abs(markup); // mark prev position as opposite to our field color
+        var newX = direction(cell).x; // eval new position regarding moving direction
+        var newY = direction(cell).y;
+        field[newY][newX] = markup; // assign our markup to new position on the field
+        return { x: newX, y: newY }; // return cells new coordinates
+    }
+
+    function moveBlock(field, direction) {
         if (!field || !canBeMoved(field, direction)) return;
         //console.log('move from ' + block[0].x + ':' + block[0].y + ' to ' + direction(block[0]).x + ':' + direction(block[0]).y);
 
-        // mark all field's points in opposite color
-        block.forEach(function(item) {
-            field[item.y][item.x] = Render.isNeutral(item.x, item.y) ? 0 : -dir;
-        });
-
-        // replace block's element, moving them
-        block = block.map(function(item) {
-            return direction(item);
-        });
-
-        // mark field's points under block
-        block.forEach(function(item) {
-            field[item.y][item.x] = dir * 2;
+        block = block.map(function(blockCell) {
+            return moveCell(field, blockCell, direction);
         });
     }
 
@@ -93,13 +115,13 @@ var Engine = (function(dimention) {
             return;
         }
         if (keypress === 97) {//a
-            move(field, left);
+            moveBlock(field, left);
         }
         if (keypress === 100) {//d
-            move(field, right);
+            moveBlock(field, right);
         }
         if (keypress === 115) {//s
-            move(field, down);
+            moveBlock(field, down);
         }
         keypress = 0;
     }
@@ -110,11 +132,11 @@ var Engine = (function(dimention) {
             initBlock(field);
             //console.info('init..');
         } else {
-            move(field, down);
+            moveBlock(field, down);
         }
         //console.log("before pa");
         playerAction(field, keypress);
-        checkState(field, down);
+        checkState(field);
         return field;
     }
 
