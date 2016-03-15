@@ -142,6 +142,11 @@ var Engine = (function(dimention) {
 
     module.setDir = function(val) {
         dir = val;
+
+        // for debug in unit tests only. Otherwise 'block' would be interprited incorrectly after change of dir
+        var oldBlock = block;
+        block = JSON.parse(localStorage.getItem('block'));
+        localStorage.setItem('block', JSON.stringify(oldBlock));
     }
 
     return module;

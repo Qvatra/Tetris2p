@@ -39,4 +39,6 @@ $(document).ready(function() {
         Render.drawState(field);
     }
 
+    localStorage.setItem('block', '[]');    
+
 });
