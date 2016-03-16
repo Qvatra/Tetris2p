@@ -10,6 +10,7 @@ var Engine = (function(dimention) {
         if (block.length !== 0 && !canBeMoved(field, down)) { // if block can't move down anymre
             mergeBlock(field);
             checkLines(field);
+
         }
     }
 
@@ -29,29 +30,48 @@ var Engine = (function(dimention) {
             });
             // ..and if so, blow the line up
             if (lineComplete) {
+                if (debug) { Render.drawState(field); debugger; }
+
                 for (var x = 0; x < dimention[0]; x++) {
                     field[y][x] = Render.isNeutral(x, y) ? 0 : -field[y][x];
                 }
+
+                if (debug) { Render.drawState(field); debugger; }
                 // ..and make all top blocks fall
                 if (dir === 1) { // ..down
                     for (var row = y - 1; row >= 0; row--) {
-                        for (var col = 0; col < dimention[0]; col++) {
-                            if (field[row][col] === dir / Math.abs(dir)) {
-                                moveCell(field, { x: col, y: row }, down);
-                            }
-                        }
+                        moveLineDown(field, row);
                     }
                 } else { // ..up
                     for (var row = y + 1; row < dimention[1]; row++) {
-                        for (var col = 0; col < dimention[0]; col++) {
-                            if (field[row][col] === dir / Math.abs(dir)) {
-                                moveCell(field, { x: col, y: row }, down);
-                            }
-                        }
+                        moveLineDown(field, row);
                     }
+                }
+                if (debug) { Render.drawState(field); debugger; }
+            }
+        }
+    }
+
+    function moveLineDown(field, row) {
+        for (var col = 0; col < dimention[0]; col++) {
+            var cell = { x: col, y: row };
+            if (field[row][col] === dir / Math.abs(dir)) {
+                if (checkCell(field, cell, down) === 0) {
+                    moveCell(field, cell, down2x);
+                } else {
+                    moveCell(field, cell, down);
                 }
             }
         }
+    }
+
+    // rerurn current state of next position
+    function checkCell(field, cell, direction) {
+        return field[direction(cell).y][direction(cell).x];
+    }
+
+    function down2x(item) {
+        return { x: item.x, y: item.y + 2 * dir };
     }
 
     // init new falling block
@@ -85,7 +105,7 @@ var Engine = (function(dimention) {
         if (!field || !canBeMoved(field, direction)) {
             return;
         }
-        
+
         block = block.map(function(blockCell) {
             return moveCell(field, blockCell, direction);
         });
