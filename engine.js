@@ -31,11 +31,9 @@ var Engine = (function(dimention) {
             // ..and if so, blow the line up
             if (lineComplete) {
                 if (debug) { Render.drawState(field); debugger; }
-
                 for (var x = 0; x < dimention[0]; x++) {
                     field[y][x] = Render.isNeutral(x, y) ? 0 : -field[y][x];
                 }
-
                 if (debug) { Render.drawState(field); debugger; }
                 // ..and make all top blocks fall
                 if (dir === 1) { // ..down
@@ -98,13 +96,11 @@ var Engine = (function(dimention) {
     }
 
     function moveBlock(direction) {
-        if (!field || !canBeMoved(direction)) {
-            return;
+        if (canBeMoved(direction)) {
+            block = block.map(function(blockCell) {
+                return moveCell(blockCell, direction);
+            });
         }
-
-        block = block.map(function(blockCell) {
-            return moveCell(blockCell, direction);
-        });
     }
 
     function down(item) {
