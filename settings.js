@@ -7,4 +7,4 @@ var field_colors = {
     holes: 'gray'
 };
 
-var debug = true;
+var debug = false;

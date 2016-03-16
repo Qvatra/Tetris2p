@@ -120,7 +120,6 @@ var Engine = (function(dimention) {
     }
 
     function playerAction(keypress) {
-        //console.log("in pa");
         if (keypress === 0) {
             return;
         }
