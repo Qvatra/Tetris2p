@@ -57,10 +57,8 @@ $(document).ready(function() {
         Api.remove('room/field');
     });
 
-    $(document).ready(function() {
-        $(document).keypress(function(e) {
-            keypress = e.keyCode;
-        });
+    $(document).keypress(function(e) {
+        keypress = e.keyCode;
     });
 
     function tick() {
