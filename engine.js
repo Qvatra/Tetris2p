@@ -8,7 +8,7 @@ var Engine = (function(dimention) {
     var dir;
 
     function checkState() {
-        if (block.length !== 0 && !canBeMoved(down)) { // if block can't move down anymre
+        if (!canBeMoved(down)) { // if block can't move down anymre
             mergeBlock();
             checkLines();
         }
@@ -16,8 +16,8 @@ var Engine = (function(dimention) {
 
     // merges an active block with the field 
     function mergeBlock() {
-        block.forEach(function(item) {
-            field[item.y][item.x] = dir;
+        block.forEach(function(blockCell) {
+            field[blockCell.y][blockCell.x] = dir;
         });
         block = [];
     }
@@ -25,7 +25,7 @@ var Engine = (function(dimention) {
     // check for complete lines and blow'em up
     function checkLines() {
         for (var y = 0; y < dimention[1]; y++) {
-            var lineComplete = field[y].every(function(item, x) {
+            var lineComplete = field[y].every(function(cell, x) {
                 return field[y][x] === field[y][(x + 1) % dimention[0]];
             });
             // ..and if so, blow the line up
@@ -63,7 +63,7 @@ var Engine = (function(dimention) {
         }
     }
 
-    // rerurn current state of next position
+    // rerurn current state of next position for a given cell
     function checkCell(cell, direction) {
         return field[direction(cell).y][direction(cell).x];
     }
@@ -71,16 +71,15 @@ var Engine = (function(dimention) {
     // init new falling block
     function initBlock() {
         block = [{ x: dimention[0] / 2, y: dir > 0 ? 0 : dimention[1] - 1 }];
-        block.forEach(function(item) {
-            field[item.y][item.x] = dir * 2;
+        block.forEach(function(cell) {
+            field[cell.y][cell.x] = dir * 2;
         });
     };
 
     // returns true if 'block' could be moved in 'direction' direction and false otherwise
     function canBeMoved(direction) {
-        return block.every(function(item) {
-            // next position
-            var p = direction(item);
+        return block.every(function(blockCell) {
+            var p = direction(blockCell); // next state
             // check for boundaries and elements of the same type
             return p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0] && field[p.y][p.x] !== dir && field[p.y][p.x] !== -2 * dir;
         });
@@ -88,10 +87,10 @@ var Engine = (function(dimention) {
 
     // move given cell and return cells new coordinates    
     function moveCell(cell, direction) {
-        var markup = field[cell.y][cell.x]; // markup is a number on a field
-        field[cell.y][cell.x] = Render.isNeutral(cell.x, cell.y) ? 0 : -markup / Math.abs(markup); // mark prev position as opposite to our field color
+        var state = field[cell.y][cell.x];
+        field[cell.y][cell.x] = Render.isNeutral(cell.x, cell.y) ? 0 : -state / Math.abs(state); // mark prev position as opposite to our field color
         var p = direction(cell);   // eval new position regarding moving direction
-        field[p.y][p.x] = markup;  // assign our markup to new position on the field
+        field[p.y][p.x] = state;   // assign our state to new position on the field
         return { x: p.x, y: p.y }; // return cells new coordinates
     }
 
@@ -103,20 +102,20 @@ var Engine = (function(dimention) {
         }
     }
 
-    function down(item) {
-        return { x: item.x, y: item.y + dir };
+    function down(cell) {
+        return { x: cell.x, y: cell.y + dir };
     }
 
-    function down2x(item) {
-        return { x: item.x, y: item.y + 2 * dir };
+    function down2x(cell) {
+        return { x: cell.x, y: cell.y + 2 * dir };
     }    
 
-    function left(item) {
-        return { x: item.x - 1, y: item.y };
+    function left(cell) {
+        return { x: cell.x - 1, y: cell.y };
     }
 
-    function right(item) {
-        return { x: item.x + 1, y: item.y };
+    function right(cell) {
+        return { x: cell.x + 1, y: cell.y };
     }
 
     function playerAction(keypress) {
