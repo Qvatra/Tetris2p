@@ -108,7 +108,7 @@ var Engine = (function(dimention) {
 
     function down2x(cell) {
         return { x: cell.x, y: cell.y + 2 * dir };
-    }    
+    }
 
     function left(cell) {
         return { x: cell.x - 1, y: cell.y };
@@ -122,13 +122,13 @@ var Engine = (function(dimention) {
         if (keypress === 0) {
             return;
         }
-        if (keypress === 97) {  // a
+        if (keypress === 97 || keypress === 37) {
             moveBlock(left);
         }
-        if (keypress === 100) { // d
+        if (keypress === 100 || keypress === 39) {
             moveBlock(right);
         }
-        if (keypress === 115) { // s
+        if (keypress === 115 || keypress === 40) {
             moveBlock(down);
         }
         keypress = 0;
@@ -144,6 +144,12 @@ var Engine = (function(dimention) {
         playerAction(keypress);
         checkState();
         return field;
+    }
+
+    module.keyboardTick = function(keypress) {
+        console.log('keyboard tick', keypress);
+        // playerAction(keypress);
+        // checkState();
     }
 
     module.setDir = function(val) {

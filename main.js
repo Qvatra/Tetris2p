@@ -1,7 +1,8 @@
 $(document).ready(function() {
     var room = {};           // local object (not db reference) that contains room info
     var playerId;            // TODO: make it specific to device or ip (or guid?)
-    var isStarted;
+    var tickStarted;
+    var keyboardStarted;
     var keypress = 0;
 
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
@@ -30,12 +31,13 @@ $(document).ready(function() {
         if (room.field) {
             Render.drawState(room.field);
 
-            if (!isStarted) {
+            if (!tickStarted) {
                 console.info('Field was found. Started..');
                 if (Object.keys(room).length !== 0) {
                     Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
                 }
-                isStarted = setInterval(tick, 1000);
+                tickStarted = setInterval(tick, 1000);
+                keyboardStarted = setInterval(KeyboardTick, 500);
             }
         }
     }, function(errorObject) {
@@ -48,16 +50,18 @@ $(document).ready(function() {
     });
 
     $('#clearDb').on('click', function() {
-        clearInterval(isStarted);
+        clearInterval(tickStarted);
+        clearInterval(keyboardStarted);
         Api.remove('room');
     });
 
     $('#clearField').on('click', function() {
-        clearInterval(isStarted);
+        clearInterval(tickStarted);
+        clearInterval(keyboardStarted);
         Api.remove('room/field');
     });
 
-    $(document).keypress(function(e) {
+    $(document).keydown(function(e) {
         keypress = e.keyCode;
     });
 
@@ -69,5 +73,9 @@ $(document).ready(function() {
         });
         keypress = 0;
     }
+
+    function KeyboardTick() {
+        Engine.keyboardTick(keypress);
+    }    
 
 });
