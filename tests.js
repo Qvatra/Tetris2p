@@ -23,7 +23,7 @@ $(document).ready(function() {
     refresh();
 
     $('#tick').on('click', function() {
-        field = Engine.tick(field, ctrl);
+        field = Engine.keyboardTick(field, ctrl);
         refresh();
     });
 

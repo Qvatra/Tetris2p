@@ -6,6 +6,7 @@ $(document).ready(function() {
     var keypress = 0;
 
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
+    playerId = $('#idInput').val();
 
     $('#join').on('click', function() {
         playerId = $('#idInput').val();
@@ -74,12 +75,12 @@ $(document).ready(function() {
     }
 
     function KeyboardTick() {
-      Api.change("room/field", function(current_value) {
-          if (current_value === null || keypress===0)
-              return;
-          return Engine.keyboardTick(current_value, keypress);
-      });
-      keypress=0;
+        Api.change("room/field", function(current_value) {
+            if (current_value === null || keypress === 0)
+                return;
+            return Engine.keyboardTick(current_value, keypress);
+        });
+        keypress = 0;
     }
 
 });
