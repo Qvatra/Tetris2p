@@ -14,7 +14,7 @@ var Engine = (function(dimention) {
         }
     }
 
-    // merges an active block with the field 
+    // merges an active block with the field
     function mergeBlock() {
         block.forEach(function(blockCell) {
             field[blockCell.y][blockCell.x] = dir;
@@ -85,7 +85,7 @@ var Engine = (function(dimention) {
         });
     }
 
-    // move given cell and return cells new coordinates    
+    // move given cell and return cells new coordinates
     function moveCell(cell, direction) {
         var state = field[cell.y][cell.x];
         field[cell.y][cell.x] = Render.isNeutral(cell.x, cell.y) ? 0 : -state / Math.abs(state); // mark prev position as opposite to our field color
@@ -134,22 +134,19 @@ var Engine = (function(dimention) {
         keypress = 0;
     }
 
-    module.tick = function(fieldState, keypress) {
+    module.tick = function(fieldState) {
+        return module.keyboardTick(fieldState, 40);
+    }
+
+    module.keyboardTick = function(fieldState, keypress) {
+        console.log('keyboard tick', keypress);
         field = fieldState;
         if (block.length === 0) {
             initBlock();
-        } else {
-            moveBlock(down);
         }
         playerAction(keypress);
         checkState();
         return field;
-    }
-
-    module.keyboardTick = function(keypress) {
-        console.log('keyboard tick', keypress);
-        // playerAction(keypress);
-        // checkState();
     }
 
     module.setDir = function(val) {

@@ -37,7 +37,7 @@ $(document).ready(function() {
                     Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
                 }
                 tickStarted = setInterval(tick, 1000);
-                keyboardStarted = setInterval(KeyboardTick, 500);
+                keyboardStarted = setInterval(KeyboardTick, 100);
             }
         }
     }, function(errorObject) {
@@ -69,13 +69,17 @@ $(document).ready(function() {
         Api.change("room/field", function(current_value) {
             if (current_value === null)
                 return;
-            return Engine.tick(current_value, keypress);
+            return Engine.tick(current_value);
         });
-        keypress = 0;
     }
 
     function KeyboardTick() {
-        Engine.keyboardTick(keypress);
-    }    
+      Api.change("room/field", function(current_value) {
+          if (current_value === null || keypress===0)
+              return;
+          return Engine.keyboardTick(current_value, keypress);
+      });
+      keypress=0;
+    }
 
 });
