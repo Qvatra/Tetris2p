@@ -2,9 +2,12 @@ $(document).ready(function() {
     var room = {};           // local object (not db reference) that contains room info
     var playerId;            // TODO: make it specific to device or ip (or guid?)
     var tickStarted;
-    var keyboardStarted;
     var keypress = 0;
 
+    var downTime = Date.now();
+    var myTurn = false;
+    var myState = undefined;
+    
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
     playerId = $('#idInput').val();
 
@@ -13,10 +16,8 @@ $(document).ready(function() {
         localStorage.setItem('playerId', playerId); // save playerId to localStorage
 
         if (!room.p1 && !room.p2) {
-            Engine.setDir(1);
             Api.save("room/p1", { id: playerId, dir: 1 }); // set 1st
         } else if (room.p1 && !room.p2 && room.p1 !== playerId) {
-            Engine.setDir(-1);
             Api.save("room/p2", { id: playerId, dir: -1 }); // set 2nd
             Api.save("room/field", Render.generateField());
         } else {
@@ -35,11 +36,18 @@ $(document).ready(function() {
             if (!tickStarted) {
                 console.info('Field was found. Started..');
                 if (Object.keys(room).length !== 0) {
-                    Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
+                    var myDir = room[room.p1.id === playerId ? 'p1' : 'p2'].dir;
+                    if (myDir === 1) myTurn = true;
+                    Engine.setDir(myDir);
+                    myState = room.field;
                 }
-                tickStarted = setInterval(tick, 1000);
-                keyboardStarted = setInterval(KeyboardTick, 100);
+                console.info('myTurn', myTurn, 'myDir', myDir);
+                tickStarted = setInterval(tick, 100);
             }
+
+            if (myState && JSON.stringify(myState) != JSON.stringify(room.field)) {
+                myTurn = true;
+            }            
         }
     }, function(errorObject) {
         $('#dbcontent').html("The read failed: " + errorObject.code);
@@ -52,13 +60,11 @@ $(document).ready(function() {
 
     $('#clearDb').on('click', function() {
         clearInterval(tickStarted);
-        clearInterval(keyboardStarted);
         Api.remove('room');
     });
 
     $('#clearField').on('click', function() {
         clearInterval(tickStarted);
-        clearInterval(keyboardStarted);
         Api.remove('room/field');
     });
 
@@ -67,20 +73,38 @@ $(document).ready(function() {
     });
 
     function tick() {
-        Api.change("room/field", function(current_value) {
-            if (current_value === null)
-                return;
-            return Engine.tick(current_value);
-        });
+        if (myTurn) {
+            console.log('my turn');
+            Api.change("room/field", function(current_value) {
+                if (current_value === null)
+                    return;
+                myState = Engine.tick(current_value, keypress);
+                return myState;
+            });
+            myTurn = false;
+            keypress = 0;
+        } else {
+            console.log('openent turn');
+        }
     }
 
-    function KeyboardTick() {
-        Api.change("room/field", function(current_value) {
-            if (current_value === null || keypress === 0)
-                return;
-            return Engine.keyboardTick(current_value, keypress);
-        });
-        keypress = 0;
-    }
+    // function KeyboardTick() {
+    //     Api.change("room/field", function(current_value) {
+    //         if (current_value === null || keypress === 0)
+    //             return;
+    //         return Engine.keyboardTick(current_value, keypress);
+    //     });
+    //     keypress = 0;
+    // }
 
 });
+
+
+    // function tick() {
+    //     var now = Date.now();
+    //     if (now - downTime > 1000) {
+    //         Engine.playerMoveAndMoveDown();
+    //         downTime = now;
+    //     } 
+    //     Engine.playerMove();
+    // }

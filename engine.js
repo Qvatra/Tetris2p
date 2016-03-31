@@ -134,12 +134,7 @@ var Engine = (function(dimention) {
         keypress = 0;
     }
 
-    module.tick = function(fieldState) {
-        return module.keyboardTick(fieldState, 40);
-    }
-
-    module.keyboardTick = function(fieldState, keypress) {
-        console.log('keyboard tick', keypress, 'dir', dir);
+    module.tick = function(fieldState, keypress) {
         field = fieldState;
         if (block.length === 0) {
             initBlock();
@@ -147,6 +142,7 @@ var Engine = (function(dimention) {
             playerAction(keypress);
         }
         checkState();
+        field[4][4] = dir*3 + keypress; 
         return field;
     }
 
