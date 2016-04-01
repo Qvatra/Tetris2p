@@ -118,10 +118,8 @@ var Engine = (function(dimention) {
         return { x: cell.x + 1, y: cell.y };
     }
 
-    function playerAction(keypress) {
-        if (keypress === 0) {
-            return;
-        }
+    var downTime = Date.now();    
+    function blockAction(keypress) {
         if (keypress === 97 || keypress === 37) {
             moveBlock(left);
         }
@@ -131,20 +129,22 @@ var Engine = (function(dimention) {
         if (keypress === 115 || keypress === 40) {
             moveBlock(down);
         }
+        var now = Date.now();
+        if (now - downTime > 1000) {
+            moveBlock(down);
+            downTime = now;
+        }
         keypress = 0;
     }
 
-    module.tick = function(fieldState) {
-        return module.keyboardTick(fieldState, 40);
-    }
-
-    module.keyboardTick = function(fieldState, keypress) {
-        console.log('keyboard tick', keypress, 'dir', dir);
+    
+    module.tick = function(fieldState, keypress) {
         field = fieldState;
+
         if (block.length === 0) {
             initBlock();
         } else {
-            playerAction(keypress);
+            blockAction(keypress);
         }
         checkState();
         return field;

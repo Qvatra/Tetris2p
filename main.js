@@ -2,9 +2,9 @@ $(document).ready(function() {
     var room = {};           // local object (not db reference) that contains room info
     var playerId;            // TODO: make it specific to device or ip (or guid?)
     var tickStarted;
-    var keyboardStarted;
     var keypress = 0;
-
+    var myState;
+    
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
     playerId = $('#idInput').val();
 
@@ -13,10 +13,8 @@ $(document).ready(function() {
         localStorage.setItem('playerId', playerId); // save playerId to localStorage
 
         if (!room.p1 && !room.p2) {
-            Engine.setDir(1);
             Api.save("room/p1", { id: playerId, dir: 1 }); // set 1st
         } else if (room.p1 && !room.p2 && room.p1 !== playerId) {
-            Engine.setDir(-1);
             Api.save("room/p2", { id: playerId, dir: -1 }); // set 2nd
             Api.save("room/field", Render.generateField());
         } else {
@@ -29,16 +27,16 @@ $(document).ready(function() {
 
         $('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
 
-        if (room.field) {
-            Render.drawState(room.field);
+        myState = room.field;        
+        if (myState) {
+            Render.drawState(myState);
 
             if (!tickStarted) {
-                console.info('Field was found. Started..');
                 if (Object.keys(room).length !== 0) {
                     Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
                 }
-                tickStarted = setInterval(tick, 1000);
-                keyboardStarted = setInterval(KeyboardTick, 100);
+                console.info('Field was found. Started.., dir = ', room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
+                tickStarted = setInterval(tick, 100);
             }
         }
     }, function(errorObject) {
@@ -52,13 +50,11 @@ $(document).ready(function() {
 
     $('#clearDb').on('click', function() {
         clearInterval(tickStarted);
-        clearInterval(keyboardStarted);
         Api.remove('room');
     });
 
     $('#clearField').on('click', function() {
         clearInterval(tickStarted);
-        clearInterval(keyboardStarted);
         Api.remove('room/field');
     });
 
@@ -67,19 +63,16 @@ $(document).ready(function() {
     });
 
     function tick() {
-        Api.change("room/field", function(current_value) {
-            if (current_value === null)
-                return;
-            return Engine.tick(current_value);
-        });
-    }
-
-    function KeyboardTick() {
-        Api.change("room/field", function(current_value) {
-            if (current_value === null || keypress === 0)
-                return;
-            return Engine.keyboardTick(current_value, keypress);
-        });
+        var oldStateString = JSON.stringify(myState);
+        var newState = Engine.tick(myState, keypress);
+        if ( oldStateString != JSON.stringify(newState)) {
+            console.log('newState');
+            Api.change("room/field", function(current_value) {
+                if (current_value === null)
+                    return;
+                return newState;
+            });
+        }
         keypress = 0;
     }
 
