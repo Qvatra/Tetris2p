@@ -140,7 +140,7 @@ var Engine = (function(dimention) {
     }
 
     module.tick = function(fieldState, keypress, allowFall) {
-        field = fieldState;
+        field = fieldState.map(function(raw) { return raw.slice() }); // copy 2d array by value
 
         if (block.length === 0) {
             initBlock();

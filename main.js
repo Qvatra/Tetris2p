@@ -4,7 +4,7 @@ $(document).ready(function() {
     var tickStarted;
     var keypress = 0;
     var myState;
-    
+
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
     playerId = $('#idInput').val();
 
@@ -27,7 +27,7 @@ $(document).ready(function() {
 
         $('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
 
-        myState = room.field;        
+        myState = room.field;
         if (myState) {
             Render.drawState(myState);
 
@@ -65,17 +65,29 @@ $(document).ready(function() {
     });
 
     function tick() {
-        var oldStateString = JSON.stringify(myState);
         var newState = Engine.tick(myState, keypress, false);
-        if ( oldStateString != JSON.stringify(newState)) {
-            //console.log('newState', newState);
-            Api.change("room/field", function(current_value) {
-                if (current_value === null)
-                    return;
-                return newState;
+
+        newState.forEach(function(row, y) {
+            row.forEach(function(cell, x) {
+                if (myState && myState[y][x] !== cell) {
+                    Api.save("room/field/" + y + "/" + x, cell); // ??? consider transaction for cell
+                }
             });
-        }
+        });
         keypress = 0;
     }
 
 });
+
+
+// function tick() {
+//     var newState = Engine.tick(myState, keypress, false);
+//     if (JSON.stringify(myState) != JSON.stringify(newState)) {
+//         Api.change("room/field", function(current_value) {
+//             if (current_value === null)
+//                 return;
+//             return newState;
+//         });
+//     }
+//     keypress = 0;
+// }
