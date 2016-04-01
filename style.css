@@ -13,3 +13,23 @@ body{
 .right {
     float: right;
 }
+
+.fab-right {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+}
+
+.fab-left {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+}
+
+.btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    background: green;
+    background: radial-gradient(#91FF00, #005200);
+}

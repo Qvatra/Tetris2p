@@ -3,7 +3,7 @@ $(document).ready(function() {
     var playerId;            // TODO: make it specific to device or ip (or guid?)
     var tickStarted;
     var keypress = 0;
-    var myState;
+    var field = undefined;
 
     $('#idInput').val(localStorage.getItem('playerId') || 'Player1'); // if playerId saved in localStorage - use it
     playerId = $('#idInput').val();
@@ -23,13 +23,15 @@ $(document).ready(function() {
     });
 
     Api.db.on("value", function(snapshot) {
+        if (field && (!snapshot.val() || !snapshot.val().room.field)) location.reload();
+
         room = snapshot.val() ? snapshot.val().room : {};
 
         $('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
 
-        myState = room.field;
-        if (myState) {
-            Render.drawState(myState);
+        field = room.field;
+        if (field) {
+            Render.drawState(field);
 
             if (!tickStarted) {
                 if (Object.keys(room).length !== 0) {
@@ -64,12 +66,22 @@ $(document).ready(function() {
         keypress = e.keyCode;
     });
 
-    function tick() {
-        var newState = Engine.tick(myState, keypress, false);
+    $('#left').mousedown(function() {
+        keypress = 37;
+    });    
+    $('#right').mousedown(function() {
+        keypress = 39;
+    });
+    $('#down').mousedown(function() {
+        keypress = 40;
+    });
 
-        newState.forEach(function(row, y) {
+    function tick() {
+        var newField = Engine.tick(field, keypress, true);
+
+        newField.forEach(function(row, y) {
             row.forEach(function(cell, x) {
-                if (myState && myState[y][x] !== cell) {
+                if (field && field[y][x] !== cell) { // save to db changed cells only
                     Api.save("room/field/" + y + "/" + x, cell); // ??? consider transaction for cell
                 }
             });
@@ -81,12 +93,12 @@ $(document).ready(function() {
 
 
 // function tick() {
-//     var newState = Engine.tick(myState, keypress, false);
-//     if (JSON.stringify(myState) != JSON.stringify(newState)) {
+//     var newField = Engine.tick(field, keypress, false);
+//     if (JSON.stringify(field) != JSON.stringify(newField)) {
 //         Api.change("room/field", function(current_value) {
 //             if (current_value === null)
 //                 return;
-//             return newState;
+//             return newField;
 //         });
 //     }
 //     keypress = 0;
