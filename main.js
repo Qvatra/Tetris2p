@@ -64,9 +64,9 @@ $(document).ready(function() {
 
     function tick() {
         var oldStateString = JSON.stringify(myState);
-        var newState = Engine.tick(myState, keypress);
+        var newState = Engine.tick(myState, keypress, true);
         if ( oldStateString != JSON.stringify(newState)) {
-            console.log('newState');
+            console.log('newState', newState);
             Api.change("room/field", function(current_value) {
                 if (current_value === null)
                     return;

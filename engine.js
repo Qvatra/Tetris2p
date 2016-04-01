@@ -119,7 +119,7 @@ var Engine = (function(dimention) {
     }
 
     var downTime = Date.now();    
-    function blockAction(keypress) {
+    function blockAction(keypress, allowFall) {
         if (keypress === 97 || keypress === 37) {
             moveBlock(left);
         }
@@ -129,22 +129,23 @@ var Engine = (function(dimention) {
         if (keypress === 115 || keypress === 40) {
             moveBlock(down);
         }
-        var now = Date.now();
-        if (now - downTime > 1000) {
-            moveBlock(down);
-            downTime = now;
+        if (allowFall) {
+            var now = Date.now();
+            if (now - downTime > 1000) {
+                moveBlock(down);
+                downTime = now;
+            }
         }
         keypress = 0;
     }
 
-    
-    module.tick = function(fieldState, keypress) {
+    module.tick = function(fieldState, keypress, allowFall) {
         field = fieldState;
 
         if (block.length === 0) {
             initBlock();
         } else {
-            blockAction(keypress);
+            blockAction(keypress, allowFall);
         }
         checkState();
         return field;
