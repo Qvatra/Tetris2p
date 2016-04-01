@@ -14,7 +14,7 @@ $(document).ready(function() {
 
         if (!room.p1 && !room.p2) {
             Api.save("room/p1", { id: playerId, dir: 1 }); // set 1st
-        } else if (room.p1 && !room.p2 && room.p1 !== playerId) {
+        } else if (room.p1 && !room.p2 && room.p1.id !== playerId) {
             Api.save("room/p2", { id: playerId, dir: -1 }); // set 2nd
             Api.save("room/field", Render.generateField());
         } else {
@@ -51,11 +51,13 @@ $(document).ready(function() {
     $('#clearDb').on('click', function() {
         clearInterval(tickStarted);
         Api.remove('room');
+        location.reload();
     });
 
     $('#clearField').on('click', function() {
         clearInterval(tickStarted);
         Api.remove('room/field');
+        location.reload();
     });
 
     $(document).keydown(function(e) {
