@@ -27,8 +27,8 @@ $(document).ready(function() {
 
         room = snapshot.val() ? snapshot.val().room : {};
 
-        //$('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
-
+        $('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
+        
         field = room.field;
         if (field) {
             //Render.drawState(field);
@@ -75,12 +75,18 @@ $(document).ready(function() {
     $('#down').mousedown(function() {
         keypress = 40;
     });
+    $('#drop').mousedown(function() {
+        keypress = 32;
+    });
+    $('#up').mousedown(function() {
+        keypress = 38;
+    });
 
     function tick() {
         var newField = Engine.tick(field, keypress, true);
-
-        Render.drawState(newField);        
-        
+               
+        Render.drawState(newField);
+                
         newField.forEach(function(row, y) {
             row.forEach(function(cell, x) {
                 if (field && field[y][x] !== cell) { // save to db changed cells only

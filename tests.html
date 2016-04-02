@@ -4,14 +4,19 @@
 </head>
 <body>
     <div class="right">
-        <div style="margin: 33px 19px;">
-            <button id="left"><--</button>
-            <button id="down" style="width: 30px;">V</button>
-            <button id="right" class="right">--></button>
-            <br /><br />
-            <button id="flip" style="width: 100%;">Flip</button>
-        </div>
         <pre id="testResults" class="panel"></pre>
+    </div>
+    
+    <div class="fab-left">
+        <button id="up" class="btn">Rotate</button>
+        <button id="down" class="btn">Down</button>
+        <button id="drop" class="btn">Drop</button>
+        <button id="flip" class="btn">Flip</button>
+    </div>
+
+    <div class="fab-right">
+        <button id="left" class="btn">Left</button>
+        <button id="right" class="btn">Right</button>
     </div>
     
     <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>

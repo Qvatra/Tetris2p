@@ -118,23 +118,49 @@ var Engine = (function(dimention) {
         return { x: cell.x + 1, y: cell.y };
     }
 
-    var downTime = Date.now();    
+    function drop(cell) {
+        if (dir === 1) { // ..down
+            for (var y = cell.y + 1; y < field_dimention[1]; y++) {
+                if (field[y][cell.x] === dir || field[y][cell.x] === -2 * dir) {
+                    return { x: cell.x, y: y - 1 };
+                }
+            }
+            return { x: cell.x, y: field_dimention[1] - 1 };
+        } else { // ..up
+            for (var y = cell.y - 1; y >= 0; y--) {
+                if (field[y][cell.x] === dir || field[y][cell.x] === -2 * dir) {
+                    return { x: cell.x, y: y + 1 };
+                }
+            }
+            return { x: cell.x, y: 0 };
+        }
+    }
+
+    var downTime = Date.now();
     function blockAction(keypress, allowFall) {
-        if (keypress === 97 || keypress === 37) {
-            moveBlock(left);
-        }
-        if (keypress === 100 || keypress === 39) {
-            moveBlock(right);
-        }
-        if (keypress === 115 || keypress === 40) {
-            moveBlock(down);
-        }
         if (allowFall) {
             var now = Date.now();
             if (now - downTime > 1000) {
                 moveBlock(down);
                 downTime = now;
             }
+        }
+        switch (keypress) {
+            case 37:
+                moveBlock(left);
+                break;
+            case 39:
+                moveBlock(right);
+                break;
+            case 40:
+                moveBlock(down);
+                break;
+            case 32:
+                moveBlock(drop);
+                break;
+            case 38:
+                // rotate
+                break;
         }
         keypress = 0;
     }

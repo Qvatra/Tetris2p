@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <input type='text' id='idInput' placeholder='Name'>
+    <input type='text' id='idInput' placeholder='Name' style="width: 150px;">
     <button id="join">Join</button>
     <button id="start">Start</button>
     <button id="clearDb" class="right">Clear DB</button>
@@ -14,12 +14,14 @@
     <pre id="dbcontent" class="panel"></pre>
 
     <div class="fab-left">
-        <button id="down" class="btn">V</button>
+        <button id="up" class="btn">Rotate</button>
+        <button id="down" class="btn">Down</button>
+        <button id="drop" class="btn">Drop</button>
     </div>
 
     <div class="fab-right">
-        <button id="left" class="btn"><--</button>
-        <button id="right" class="btn">--></button>
+        <button id="left" class="btn">Left</button>
+        <button id="right" class="btn">Right</button>
     </div>
 
     <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
