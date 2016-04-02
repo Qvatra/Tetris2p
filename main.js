@@ -27,18 +27,18 @@ $(document).ready(function() {
 
         room = snapshot.val() ? snapshot.val().room : {};
 
-        $('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
+        //$('#dbcontent').html(Render.jsonField(room.field) + '\n' + JSON.stringify(Object.assign({}, room, { field: undefined }), null, 2));
 
         field = room.field;
         if (field) {
-            Render.drawState(field);
+            //Render.drawState(field);
 
             if (!tickStarted) {
                 if (Object.keys(room).length !== 0) {
                     Engine.setDir(room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
                 }
                 console.info('Field was found. Started.., dir = ', room[room.p1.id === playerId ? 'p1' : 'p2'].dir);
-                tickStarted = setInterval(tick, 100);
+                tickStarted = setInterval(tick, 200);
             }
         }
     }, function(errorObject) {
@@ -79,6 +79,8 @@ $(document).ready(function() {
     function tick() {
         var newField = Engine.tick(field, keypress, true);
 
+        Render.drawState(newField);        
+        
         newField.forEach(function(row, y) {
             row.forEach(function(cell, x) {
                 if (field && field[y][x] !== cell) { // save to db changed cells only
