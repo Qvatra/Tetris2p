@@ -163,22 +163,19 @@ var Engine = (function(dimention) {
         return { x: cell.x + 1, y: cell.y };
     }
 
-    function drop(cell) {
-        if (dir === 1) { // ..down
-            for (var y = cell.y + 1; y < field_dimention[1]; y++) {
-                if (field[y][cell.x] === dir || field[y][cell.x] === -2 * dir) {
-                    return { x: cell.x, y: y - 1 };
-                }
-            }
-            return { x: cell.x, y: field_dimention[1] - 1 };
-        } else { // ..up
-            for (var y = cell.y - 1; y >= 0; y--) {
-                if (field[y][cell.x] === dir || field[y][cell.x] === -2 * dir) {
-                    return { x: cell.x, y: y + 1 };
-                }
-            }
-            return { x: cell.x, y: 0 };
+    function drop() {
+	    forEachBlockOfPiece(block, function(x, y) {
+		var state = field[y][x];
+		field[y][x] = Render.isNeutral(x, y) ? 0 : -state / Math.abs(state);
+	    }, false);
+        while (canBeMoved(down)) {
+            var p = down({x:block.x, y:block.y});
+            block.x=p.x;
+            block.y=p.y;            
         }
+	forEachBlockOfPiece(block, function(x, y) {
+                field[y][x] = dir * 2;
+            }, false);
     }
 
     var downTime = Date.now();
@@ -201,7 +198,7 @@ var Engine = (function(dimention) {
                 moveBlock(down);
                 break;
             case 32:
-                moveBlock(drop);
+                drop();
                 break;
             case 38:
                 rotateBlock();
@@ -211,7 +208,7 @@ var Engine = (function(dimention) {
     }
 
     function rotateBlock() {
-      var block2 = {x:block.x, y:block.y, pieceNum:block.pieceNum, rotation:((block.rotation+1)%4)};
+      var block2 = {x:block.x, y:block.y, pieceNum:block.pieceNum, rotation:(block.rotation === 0 ? 3 : block.rotation-1)};
       var can=true;
       forEachBlockOfPiece(block2, function(x, y) {
           if (!(y >= 0 && x >= 0 && y < dimention[1] && x < dimention[0] && field[y][x] !== dir && field[y][x] !== -2 * dir)) {
