@@ -40,7 +40,8 @@ var Render = (function(dimention, size, colors) {
                     .attr({
                         fill: getColor(cell),
                         stroke: cell > 0 ? colors.field[1] : colors.field[0],
-                        "stroke-width": 0.5
+                        "stroke-width": 0.5,
+                        "stroke-opacity": 0.2
                     });
             });
         });
@@ -65,7 +66,7 @@ var Render = (function(dimention, size, colors) {
     // returns true if given x, y reserved as neutral field cell    
     module.isNeutral = function(x, y) {
         return dimention[0] - x - 1 === (dimention[1] - y - 1) % dimention[0];
-    }    
+    }
 
     // returns field as a formatted string
     module.jsonField = function(field) {
