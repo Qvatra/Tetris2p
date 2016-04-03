@@ -2,10 +2,44 @@ var Engine = (function(dimention) {
     "use strict";
     var module = {};
 
+    // Pieces.  (Indexed by piece rotation (0-3), row (0-3), piece number (0-6))
+     var PIECES = [];
+     for (var i = 0; i < 4; i++) { PIECES[i] = []; }
+     PIECES[0][0] = [ "    ",   "    ",   "    ",   "    ",   "    ",   "    ",   "    " ];
+     PIECES[0][1] = [ "    ",   "B   ",   "  O ",   " YY ",   " GG ",   " P  ",   "RR  " ];
+     PIECES[0][2] = [ "bbbb",   "BBB ",   "OOO ",   " YY ",   "GG  ",   "PPP ",   " RR " ];
+     PIECES[0][3] = [ "    ",   "    ",   "    ",   "    ",   "    ",   "    ",   "    " ];
+     PIECES[1][0] = [ " b  ",   "    ",   "    ",   "    ",   "    ",   "    ",   "  R " ];
+     PIECES[1][1] = [ " b  ",   " B  ",   "OO  ",   " YY ",   " G  ",   " P  ",   " RR " ];
+     PIECES[1][2] = [ " b  ",   " B  ",   " O  ",   " YY ",   " GG ",   " PP ",   " R  " ];
+     PIECES[1][3] = [ " b  ",   "BB  ",   " O  ",   "    ",   "  G ",   " P  ",   "    " ];
+     PIECES[2][0] = [ "    ",   "    ",   "    ",   "    ",   "    ",   "    ",   "    " ];
+     PIECES[2][1] = [ "    ",   "    ",   "    ",   " YY ",   " GG ",   "    ",   "RR  " ];
+     PIECES[2][2] = [ "bbbb",   "BBB ",   "OOO ",   " YY ",   "GG  ",   "PPP ",   " RR " ];
+     PIECES[2][3] = [ "    ",   "  B ",   "O   ",   "    ",   "    ",   " P  ",   "    " ];
+     PIECES[3][0] = [ " b  ",   "    ",   "    ",   "    ",   "    ",   "    ",   "  R " ];
+     PIECES[3][1] = [ " b  ",   " BB ",   " O  ",   " YY ",   " G  ",   " P  ",   " RR " ];
+     PIECES[3][2] = [ " b  ",   " B  ",   " O  ",   " YY ",   " GG ",   "PP  ",   " R  " ];
+     PIECES[3][3] = [ " b  ",   " B  ",   " OO ",   "    ",   "  G ",   " P  ",   "    " ];
+
     // private variables
     var field = [];
-    var block = [];
+    var block = null;
     var dir;
+
+    var forEachBlockOfPiece = function (piece, fn, includeInvalid) {
+        for (var blockY = 0; blockY < 4; blockY++) {
+          for (var blockX = 0; blockX < 4; blockX++) {
+            var colorValue = PIECES[piece.rotation][blockY][piece.pieceNum].charAt(blockX);
+            if (colorValue != ' ') {
+              var x = piece.x + blockX, y = piece.y + blockY;
+              if (includeInvalid || (x >= 0 && x < field_dimention[0] && y >= 0 && y < field_dimention[1])) {
+                fn(x, y);
+              }
+            }
+          }
+        }
+      };
 
     function checkState() {
         if (!canBeMoved(down)) { // if block can't move down anymre
@@ -16,10 +50,10 @@ var Engine = (function(dimention) {
 
     // merges an active block with the field
     function mergeBlock() {
-        block.forEach(function(blockCell) {
-            field[blockCell.y][blockCell.x] = dir;
-        });
-        block = [];
+        forEachBlockOfPiece(block,function(x, y) {
+            field[y][x] = dir;
+        }, false);
+        block = null;
     }
 
     // check for complete lines and blow'em up
@@ -70,19 +104,23 @@ var Engine = (function(dimention) {
 
     // init new falling block
     function initBlock() {
-        block = [{ x: dimention[0] / 2, y: dir > 0 ? 0 : dimention[1] - 1 }];
-        block.forEach(function(cell) {
-            field[cell.y][cell.x] = dir * 2;
-        });
+        block = { x: dimention[0] / 2 - 2, y: dir > 0 ? 0 : dimention[1] - 3, rotation: 0, pieceNum: Math.floor(Math.random() * 7) };
+        forEachBlockOfPiece(block, function(x, y) {
+            field[y][x] = dir * 2;
+        }, false);
     };
 
     // returns true if 'block' could be moved in 'direction' direction and false otherwise
     function canBeMoved(direction) {
-        return block.every(function(blockCell) {
-            var p = direction(blockCell); // next state
+        var can = true;
+        forEachBlockOfPiece(block, function(x, y) {
+            var p = direction({x:x,y:y}); // next state
             // check for boundaries and elements of the same type
-            return p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0] && field[p.y][p.x] !== dir && field[p.y][p.x] !== -2 * dir;
-        });
+            if (!(p.y >= 0 && p.x >= 0 && p.y < dimention[1] && p.x < dimention[0] && field[p.y][p.x] !== dir && field[p.y][p.x] !== -2 * dir)) {
+                can = false;
+            }
+        }, true);
+        return can;
     }
 
     // move given cell and return cells new coordinates
@@ -96,9 +134,16 @@ var Engine = (function(dimention) {
 
     function moveBlock(direction) {
         if (canBeMoved(direction)) {
-            block = block.map(function(blockCell) {
-                return moveCell(blockCell, direction);
-            });
+            forEachBlockOfPiece(block, function(x, y) {
+                var state = field[y][x];
+                field[y][x] = Render.isNeutral(x, y) ? 0 : -state / Math.abs(state);
+            }, false);
+            var p = direction({x:block.x, y:block.y});
+            block.x=p.x;
+            block.y=p.y;
+            forEachBlockOfPiece(block, function(x, y) {
+                field[y][x] = dir * 2;
+            }, false);
         }
     }
 
@@ -159,16 +204,36 @@ var Engine = (function(dimention) {
                 moveBlock(drop);
                 break;
             case 38:
-                // rotate
+                rotateBlock();
                 break;
         }
         keypress = 0;
     }
 
+    function rotateBlock() {
+      var block2 = {x:block.x, y:block.y, pieceNum:block.pieceNum, rotation:((block.rotation+1)%4)};
+      var can=true;
+      forEachBlockOfPiece(block2, function(x, y) {
+          if (!(y >= 0 && x >= 0 && y < dimention[1] && x < dimention[0] && field[y][x] !== dir && field[y][x] !== -2 * dir)) {
+            can = false;
+          }
+      }, true);
+      if (can) {
+        forEachBlockOfPiece(block, function(x, y) {
+            var state = field[y][x];
+            field[y][x] = Render.isNeutral(x, y) ? 0 : -state / Math.abs(state);
+        }, false);
+        block = block2;
+        forEachBlockOfPiece(block, function(x, y) {
+            field[y][x] = dir * 2;
+        }, false);
+      }
+    }
+
     module.tick = function(fieldState, keypress, allowFall) {
         field = fieldState.map(function(raw) { return raw.slice() }); // copy 2d array by value
 
-        if (block.length === 0) {
+        if (block === null) {
             initBlock();
         } else {
             blockAction(keypress, allowFall);

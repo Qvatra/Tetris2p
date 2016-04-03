@@ -57,6 +57,6 @@ $(document).ready(function() {
         Render.drawState(field);
     }
 
-    localStorage.setItem('block', '[]');    
+    localStorage.setItem('block', 'null');    
 
 });
